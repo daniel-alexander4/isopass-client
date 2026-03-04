@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Isopass</title>
+  <link href="/styles.css" rel="stylesheet"/>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <span class="brand">Isopass</span>
+      <button id="settings-toggle" class="ghost">Settings</button>
+    </header>
+
+    <div id="settings" class="panel hidden" style="display:none;">
+      <label>
+        Server URL
+        <input id="server-url" type="text" placeholder="https://isopass.example.com:8443"/>
+      </label>
+      <label>
+        Bearer Token
+        <div class="input-wrap">
+          <input id="token" type="password" placeholder="paste token"/>
+          <button id="token-toggle" class="ghost">Reveal</button>
+        </div>
+      </label>
+      <div class="checkbox-row">
+        <label for="tls-skip" style="margin:0;">Skip TLS verification</label>
+        <input id="tls-skip" type="checkbox"/>
+      </div>
+      <div style="display:flex;justify-content:flex-end;">
+        <button id="save-settings">Save &amp; Connect</button>
+      </div>
+      <div id="client-info" class="client-info hidden"></div>
+      <button id="sso-login" class="ghost hidden" style="margin-top:8px;">Sign in with SSO</button>
+    </div>
+
+    <div id="search">
+      <div class="search-row">
+        <input id="search-tags" type="text" placeholder="Search tags (comma-separated)"/>
+        <select id="search-type">
+          <option value="">All types</option>
+          <option value="password">password</option>
+          <option value="api_key">api_key</option>
+          <option value="username_password">username_password</option>
+          <option value="key_value_pair">key_value_pair</option>
+          <option value="bearer_token">bearer_token</option>
+          <option value="connection_string">connection_string</option>
+          <option value="json">json</option>
+          <option value="url">url</option>
+          <option value="pem_private_key">pem_private_key</option>
+          <option value="tls_bundle">tls_bundle</option>
+        </select>
+        <button id="run-search">Search</button>
+      </div>
+      <div id="status" class="status"></div>
+      <div id="results" class="results"></div>
+    </div>
+  </div>
+
+  <template id="result-template">
+    <div class="card">
+      <div class="card-summary">
+        <span class="pill pill-org"></span>
+        <span class="pill pill-scope"></span>
+        <span class="pill pill-type"></span>
+      </div>
+      <div class="card-detail hidden">
+        <div class="value-fields"></div>
+        <div class="detail-actions">
+          <button class="reveal ghost">Reveal</button>
+          <button class="copy ghost">Copy</button>
+        </div>
+        <div class="card-tags"></div>
+      </div>
+    </div>
+  </template>
+
+  <script src="/app.js"></script>
+</body>
+</html>
