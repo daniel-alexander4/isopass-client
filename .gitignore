@@ -1,2 +1,32 @@
+# Binaries
+isopass-cli
+isopass-gui
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test
+*.test
+*.out
+
+# Go workspace
+go.work
+go.work.sum
+
+# Wails build output
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project
 .env
 .claude
+CLAUDE.md
