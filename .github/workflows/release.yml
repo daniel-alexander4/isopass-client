@@ -58,14 +58,10 @@ jobs:
         working-directory: cmd/isopass-gui
         run: wails build -o isopass-gui
 
-      - name: Install NSIS
-        if: matrix.platform == 'windows'
-        run: choco install nsis -y
-
       - name: Build GUI (Windows)
         if: matrix.platform == 'windows'
         working-directory: cmd/isopass-gui
-        run: wails build -o isopass-gui.exe -nsis
+        run: wails build -platform windows/amd64 -nsis
 
       - name: Build CLI
         run: go build -o isopass-cli${{ matrix.platform == 'windows' && '.exe' || '' }} ./cmd/isopass-cli
@@ -101,9 +97,8 @@ jobs:
         shell: bash
         run: |
           mkdir -p artifacts
-          ls -la cmd/isopass-gui/build/bin/
           cp cmd/isopass-gui/build/bin/isopass-gui.exe artifacts/
-          cp cmd/isopass-gui/build/bin/*-amd64-installer.exe artifacts/isopass-gui-amd64-installer.exe
+          cp cmd/isopass-gui/build/bin/*-installer.exe artifacts/isopass-gui-amd64-installer.exe
           cp isopass-cli.exe artifacts/
 
       - uses: actions/upload-artifact@v4

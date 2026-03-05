@@ -17,6 +17,7 @@ go.work.sum
 
 # Wails build output
 **/build/bin/
+**/wailsjs/
 
 # IDE
 .vscode/
