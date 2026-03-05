@@ -1,0 +1,14 @@
+name: isopass
+arch: amd64
+platform: linux
+version: ${VERSION}
+maintainer: daniel-alexander4
+description: Isopass secrets management client
+homepage: https://github.com/daniel-alexander4/isopass-client
+license: MIT
+contents:
+  - src: build/bin/isopass-gui
+    dst: /usr/bin/isopass-gui
+depends:
+  - libgtk-3-0
+  - ${WEBKIT_DEP}

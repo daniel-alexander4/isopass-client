@@ -1,0 +1,119 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            platform: linux
+            webkit_dev: libwebkit2gtk-4.0-dev
+            webkit_dep: libwebkit2gtk-4.0-37
+            goflags: ""
+            deb_suffix: "22.04"
+          - os: ubuntu-24.04
+            platform: linux
+            webkit_dev: libwebkit2gtk-4.1-dev
+            webkit_dep: libwebkit2gtk-4.1-0
+            goflags: "-tags=webkit2gtk_41"
+            deb_suffix: "24.04"
+          - os: macos-latest
+            platform: darwin
+          - os: windows-latest
+            platform: windows
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc pkg-config libgtk-3-dev ${{ matrix.webkit_dev }}
+
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Build GUI (Linux)
+        if: matrix.platform == 'linux'
+        env:
+          GOFLAGS: ${{ matrix.goflags }}
+        run: wails build -o isopass-gui
+
+      - name: Build GUI (macOS)
+        if: matrix.platform == 'darwin'
+        run: wails build -o isopass-gui
+
+      - name: Build GUI (Windows)
+        if: matrix.platform == 'windows'
+        run: wails build -o isopass-gui.exe -nsis
+
+      - name: Build CLI
+        run: go build -o isopass-cli${{ matrix.platform == 'windows' && '.exe' || '' }} ./cmd/isopass-cli
+
+      - name: Package .deb
+        if: matrix.platform == 'linux'
+        env:
+          VERSION: ${{ github.ref_name }}
+          WEBKIT_DEP: ${{ matrix.webkit_dep }}
+        run: |
+          go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
+          VERSION="${VERSION#v}"
+          export VERSION
+          nfpm pkg --packager deb --target "isopass_${VERSION}_amd64_${{ matrix.deb_suffix }}.deb"
+
+      - name: Prepare artifacts (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          mkdir -p artifacts
+          cp build/bin/isopass-gui artifacts/isopass-gui-linux-${{ matrix.deb_suffix }}
+          cp isopass-cli artifacts/isopass-cli-linux-${{ matrix.deb_suffix }}
+          cp *.deb artifacts/
+
+      - name: Prepare artifacts (macOS)
+        if: matrix.platform == 'darwin'
+        run: |
+          mkdir -p artifacts
+          cp build/bin/isopass-gui artifacts/isopass-gui-darwin
+          cp isopass-cli artifacts/isopass-cli-darwin
+
+      - name: Prepare artifacts (Windows)
+        if: matrix.platform == 'windows'
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          cp build/bin/isopass-gui.exe artifacts/
+          cp build/bin/isopass-gui-amd64-installer.exe artifacts/
+          cp isopass-cli.exe artifacts/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-${{ matrix.os }}
+          path: artifacts/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
