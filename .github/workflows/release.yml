@@ -23,7 +23,7 @@ jobs:
             platform: linux
             webkit_dev: libwebkit2gtk-4.1-dev
             webkit_dep: libwebkit2gtk-4.1-0
-            goflags: "-tags=webkit2gtk_41"
+            goflags: "-tags=webkit2_41"
             deb_suffix: "24.04"
           - os: macos-latest
             platform: darwin
