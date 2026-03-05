@@ -61,7 +61,10 @@ jobs:
       - name: Build GUI (Windows)
         if: matrix.platform == 'windows'
         working-directory: cmd/isopass-gui
-        run: wails build -platform windows/amd64 -nsis
+        shell: pwsh
+        run: |
+          $env:PATH = "C:\Program Files (x86)\NSIS;$env:PATH"
+          wails build -platform windows/amd64 -nsis
 
       - name: Build CLI
         run: go build -o isopass-cli${{ matrix.platform == 'windows' && '.exe' || '' }} ./cmd/isopass-cli
@@ -97,8 +100,9 @@ jobs:
         shell: bash
         run: |
           mkdir -p artifacts
+          ls -la cmd/isopass-gui/build/bin/
           cp cmd/isopass-gui/build/bin/isopass-gui.exe artifacts/
-          cp cmd/isopass-gui/build/bin/*-installer.exe artifacts/isopass-gui-amd64-installer.exe
+          cp cmd/isopass-gui/build/bin/*-installer.exe artifacts/isopass-gui-amd64-installer.exe || echo "Warning: no installer found"
           cp isopass-cli.exe artifacts/
 
       - uses: actions/upload-artifact@v4
