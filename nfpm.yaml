@@ -7,7 +7,7 @@ description: Isopass secrets management client
 homepage: https://github.com/daniel-alexander4/isopass-client
 license: MIT
 contents:
-  - src: build/bin/isopass-gui
+  - src: cmd/isopass-gui/build/bin/isopass-gui
     dst: /usr/bin/isopass-gui
 depends:
   - libgtk-3-0

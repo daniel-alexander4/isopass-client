@@ -1,0 +1,21 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "isopass-gui",
+  "outputfilename": "isopass-gui",
+  "frontend:dir": "frontend",
+  "wailsjsdir": "frontend",
+  "author": {
+    "name": "",
+    "email": ""
+  },
+  "info": {
+    "companyName": "",
+    "productName": "Isopass",
+    "productVersion": "1.0.0",
+    "copyright": "",
+    "comments": ""
+  },
+  "nsisType": "multiple",
+  "obfuscated": false,
+  "garbleargs": ""
+}

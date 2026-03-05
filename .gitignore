@@ -1,6 +1,6 @@
 # Binaries
-isopass-cli
-isopass-gui
+/isopass-cli
+/isopass-gui
 *.exe
 *.exe~
 *.dll
@@ -16,7 +16,7 @@ go.work
 go.work.sum
 
 # Wails build output
-build/
+**/build/bin/
 
 # IDE
 .vscode/

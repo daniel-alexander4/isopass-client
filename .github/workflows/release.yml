@@ -17,13 +17,13 @@ jobs:
             platform: linux
             webkit_dev: libwebkit2gtk-4.0-dev
             webkit_dep: libwebkit2gtk-4.0-37
-            goflags: ""
+            wails_tags: ""
             deb_suffix: "22.04"
           - os: ubuntu-24.04
             platform: linux
             webkit_dev: libwebkit2gtk-4.1-dev
             webkit_dep: libwebkit2gtk-4.1-0
-            goflags: "-tags=webkit2_41"
+            wails_tags: "webkit2_41"
             deb_suffix: "24.04"
           - os: macos-latest
             platform: darwin
@@ -50,16 +50,21 @@ jobs:
 
       - name: Build GUI (Linux)
         if: matrix.platform == 'linux'
-        env:
-          GOFLAGS: ${{ matrix.goflags }}
-        run: wails build -o isopass-gui
+        working-directory: cmd/isopass-gui
+        run: wails build -o isopass-gui ${{ matrix.wails_tags && format('-tags {0}', matrix.wails_tags) || '' }}
 
       - name: Build GUI (macOS)
         if: matrix.platform == 'darwin'
+        working-directory: cmd/isopass-gui
         run: wails build -o isopass-gui
+
+      - name: Install NSIS
+        if: matrix.platform == 'windows'
+        run: choco install nsis -y
 
       - name: Build GUI (Windows)
         if: matrix.platform == 'windows'
+        working-directory: cmd/isopass-gui
         run: wails build -o isopass-gui.exe -nsis
 
       - name: Build CLI
@@ -80,7 +85,7 @@ jobs:
         if: matrix.platform == 'linux'
         run: |
           mkdir -p artifacts
-          cp build/bin/isopass-gui artifacts/isopass-gui-linux-${{ matrix.deb_suffix }}
+          cp cmd/isopass-gui/build/bin/isopass-gui artifacts/isopass-gui-linux-${{ matrix.deb_suffix }}
           cp isopass-cli artifacts/isopass-cli-linux-${{ matrix.deb_suffix }}
           cp *.deb artifacts/
 
@@ -88,7 +93,7 @@ jobs:
         if: matrix.platform == 'darwin'
         run: |
           mkdir -p artifacts
-          cp build/bin/isopass-gui artifacts/isopass-gui-darwin
+          cp cmd/isopass-gui/build/bin/isopass-gui.app/Contents/MacOS/isopass-gui artifacts/isopass-gui-darwin
           cp isopass-cli artifacts/isopass-cli-darwin
 
       - name: Prepare artifacts (Windows)
@@ -96,8 +101,9 @@ jobs:
         shell: bash
         run: |
           mkdir -p artifacts
-          cp build/bin/isopass-gui.exe artifacts/
-          cp build/bin/isopass-gui-amd64-installer.exe artifacts/
+          ls -la cmd/isopass-gui/build/bin/
+          cp cmd/isopass-gui/build/bin/isopass-gui.exe artifacts/
+          cp cmd/isopass-gui/build/bin/*-amd64-installer.exe artifacts/isopass-gui-amd64-installer.exe
           cp isopass-cli.exe artifacts/
 
       - uses: actions/upload-artifact@v4
